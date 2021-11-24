@@ -12,5 +12,11 @@ export class Article {
   description: string;
 
   @Column()
+  body: string;
+
+  @Column()
+  likes: number;
+
+  @Column()
   createAt: Date;
 }
