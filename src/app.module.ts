@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminModule } from './admin/admin.module';
 import { ArticlesModule } from './articles/articles.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [

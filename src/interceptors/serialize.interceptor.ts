@@ -17,7 +17,6 @@ export class SerializeInterceptor implements NestInterceptor {
   constructor(private dto: any) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const now = Date.now();
     return next.handle().pipe(
       map((data: any) => {
         return plainToInstance(this.dto, data, {

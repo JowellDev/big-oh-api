@@ -24,6 +24,9 @@ export class UsersService {
 
   async create(email, password): Promise<User> {
     const user = this.usersRepository.create({ email, password });
+    const date = new Date();
+    const fullDate = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
+    user.createdAt = fullDate;
     return await this.usersRepository.save(user);
   }
 }
