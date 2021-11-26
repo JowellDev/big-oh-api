@@ -72,4 +72,10 @@ export class AdminService {
   async changeUserStatus(email: string) {
     return await this.usersService.changeUserStatus(email);
   }
+
+  async getAllMembers() {
+    return await this.usersService.getAllMembers();
+  }
+
+  async changeUserRole(email: string, isAdmin: boolean) {}
 }

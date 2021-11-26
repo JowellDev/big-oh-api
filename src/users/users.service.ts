@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -9,10 +14,6 @@ export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}
-
-  async findAll(): Promise<User[]> {
-    return await this.usersRepository.find();
-  }
 
   async findOne(id: number): Promise<User> {
     const user = await this.usersRepository.findOne(id);
@@ -61,6 +62,21 @@ export class UsersService {
     return await this.usersRepository.save(userFound);
   }
 
+  async deleteAccount(id: number, user: User) {
+    const userFound = await this.findOne(id);
+    if (!userFound || userFound.id !== user.id) {
+      throw new UnauthorizedException(
+        'You are not authorized to delete this user',
+      );
+    }
+
+    await this.usersRepository.remove(userFound);
+
+    return {
+      message: 'Account deleted',
+    };
+  }
+
   async deleteAdmin(email: string) {
     const user = await this.findByEmail(email);
     if (!user || !user.isAdmin) {
@@ -82,5 +98,9 @@ export class UsersService {
 
   async findAdmins(): Promise<User[]> {
     return await this.usersRepository.find({ where: { isAdmin: true } });
+  }
+
+  async getAllMembers(): Promise<User[]> {
+    return await this.usersRepository.find({ where: { isAdmin: false } });
   }
 }

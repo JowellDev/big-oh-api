@@ -1,3 +1,4 @@
+import { UserDto } from './../users/dtos/user.dto';
 import {
   Body,
   Controller,
@@ -58,5 +59,12 @@ export class AdminController {
   async changeUserStatus(@Query('email') userEmail: string) {
     const result = await this.adminService.changeUserStatus(userEmail);
     return result;
+  }
+
+  @Get('all-members')
+  @UseGuards(AdminGuard)
+  @Serialize(UserDto)
+  async getAllMembers() {
+    return await this.adminService.getAllMembers();
   }
 }

@@ -27,7 +27,7 @@ export class AuthService {
       email: newUser.email,
     });
 
-    const { password, isAdmin, isSuperAdmin, ...result } = userFound;
+    const { password, isAdmin, isSuperAdmin, ...result } = newUser;
     return {
       user: result,
       token,

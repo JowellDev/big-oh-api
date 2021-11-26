@@ -8,6 +8,7 @@ import {
   Req,
   Param,
   Query,
+  Delete,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { UsersService } from './users.service';
@@ -69,6 +70,12 @@ export class UsersController {
   @Serialize(UserDto)
   async getUser(@Param('id') id: string) {
     return await this.usersService.findOne(+id);
+  }
+
+  @Delete('user/:id')
+  @UseGuards(AuthGuard)
+  async deleteAccount(@CurrentUser() user: User, @Param('id') id: string) {
+    return await this.usersService.deleteAccount(+id, user);
   }
 
   @Post('update')
