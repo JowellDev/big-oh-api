@@ -14,9 +14,9 @@ export class Article {
   @Column()
   body: string;
 
-  @Column()
+  @Column({ default: 0 })
   likes: number;
 
   @Column()
-  createAt: Date;
+  createAt: string;
 }
