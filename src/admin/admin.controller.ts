@@ -8,6 +8,8 @@ import {
   Put,
   Delete,
   Get,
+  Query,
+  Patch,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AdminDto } from './dtos/admin.dto';
@@ -49,10 +51,10 @@ export class AdminController {
     return result;
   }
 
-  // @Put('change-user-status/:email')
-  // @UseGuards(AuthGuard, AdminGuard)
-  // async changeUserStatus(@Param('email') userEmail: string) {
-  //   const result = await this.adminService.changeUserStatus(userEmail);
-  //   return result;
-  // }
+  @Put('change-user-status')
+  @UseGuards(AuthGuard, AdminGuard)
+  async changeUserStatus(@Query('email') userEmail: string) {
+    const result = await this.adminService.changeUserStatus(userEmail);
+    return result;
+  }
 }

@@ -57,9 +57,9 @@ export class UsersService {
     return await this.usersRepository.save(userFound);
   }
 
-  async delete(email: string) {
+  async deleteAdmin(email: string) {
     const user = await this.findByEmail(email);
-    if (!user && !user.isAdmin) {
+    if (!user || !user.isAdmin) {
       throw new NotFoundException('User not found');
     }
 

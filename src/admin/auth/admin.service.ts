@@ -66,15 +66,10 @@ export class AdminService {
   }
 
   async deleteAdmin(email: string) {
-    const userFound = await this.usersService.findByEmail(email);
-    if (!userFound) {
-      throw new NotFoundException('This admin do not exists');
-    }
-
-    return await this.usersService.delete(email);
+    return await this.usersService.deleteAdmin(email);
   }
 
-  // async changeUserStatus(email: string) {
-  //   return await this.usersService.changeUserStatus(email);
-  // }
+  async changeUserStatus(email: string) {
+    return await this.usersService.changeUserStatus(email);
+  }
 }
