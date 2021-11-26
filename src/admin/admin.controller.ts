@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AdminDto } from './dtos/admin.dto';
-import { AdminListDto } from './dtos/admin-list.dto';
+import { AdminDetailDto } from './dtos/admin-list.dto';
 import { AdminService } from './auth/admin.service';
 import { AuthGuard } from '../guards/auth.guard';
 import { AdminGuard } from '../guards/admin.guard';
@@ -31,28 +31,30 @@ export class AdminController {
   }
 
   @Get('list')
-  @UseGuards(AuthGuard, AdminGuard)
-  @Serialize(AdminListDto)
+  @UseGuards(AdminGuard)
+  @Serialize(AdminDetailDto)
   async getAdmins() {
     return await this.adminService.getAdmins();
   }
 
   @Post('create-admin')
-  @UseGuards(AuthGuard, SuperAdmin)
+  @UseGuards(SuperAdmin)
+  @Serialize(AdminDetailDto)
   async addAdmin(@Body() body: AdminDto) {
     const result = await this.adminService.addAdmin(body);
     return result;
   }
 
   @Delete('delete-admin/:email')
-  @UseGuards(AuthGuard, SuperAdmin)
+  @UseGuards(SuperAdmin)
   async deleteAdmin(@Param('email') email: string) {
     const result = await this.adminService.deleteAdmin(email);
     return result;
   }
 
   @Put('change-user-status')
-  @UseGuards(AuthGuard, AdminGuard)
+  @UseGuards(AdminGuard)
+  @Serialize(AdminDetailDto)
   async changeUserStatus(@Query('email') userEmail: string) {
     const result = await this.adminService.changeUserStatus(userEmail);
     return result;

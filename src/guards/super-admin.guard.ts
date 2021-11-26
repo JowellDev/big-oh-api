@@ -10,7 +10,7 @@ export class SuperAdmin implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
     const authenticatedUser = request.user as User;
-    if (!authenticatedUser.isSuperAdmin) {
+    if (!authenticatedUser || !authenticatedUser.isSuperAdmin) {
       throw new UnauthorizedException('Super admin permission is required');
     }
     return true;

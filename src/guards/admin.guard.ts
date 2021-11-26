@@ -10,7 +10,7 @@ export class AdminGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
     const authenticatedUser = request.user as User;
-    if (!authenticatedUser.isAdmin) {
+    if (!authenticatedUser || !authenticatedUser.isAdmin) {
       throw new UnauthorizedException();
     }
     return true;

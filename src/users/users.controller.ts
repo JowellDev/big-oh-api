@@ -64,6 +64,7 @@ export class UsersController {
     return result;
   }
 
+  @UseGuards(AdminGuard)
   @Post('update')
   @Serialize(UserDto)
   async update(@Body('email') email: any) {
