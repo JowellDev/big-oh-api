@@ -64,8 +64,15 @@ export class UsersController {
     return result;
   }
 
-  @UseGuards(AdminGuard)
+  @Get('user/:id')
+  @UseGuards(AuthGuard)
+  @Serialize(UserDto)
+  async getUser(@Param('id') id: string) {
+    return await this.usersService.findOne(+id);
+  }
+
   @Post('update')
+  @UseGuards(AdminGuard)
   @Serialize(UserDto)
   async update(@Body('email') email: any) {
     const result = await this.usersService.update(email);

@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AdminDto } from './dtos/admin.dto';
-import { AdminDetailDto } from './dtos/admin-list.dto';
+import { AdminDetailDto } from './dtos/admin-detail.dto';
 import { AdminService } from './auth/admin.service';
 import { AuthGuard } from '../guards/auth.guard';
 import { AdminGuard } from '../guards/admin.guard';
