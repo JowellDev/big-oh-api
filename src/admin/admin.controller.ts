@@ -25,12 +25,12 @@ export class AdminController {
     return response.status(200).json(result);
   }
 
-  // @Post('create-admin')
-  // @UseGuards(AuthGuard, SuperAdmin)
-  // async addAdmin(@Body() body: AdminDto) {
-  //   const result = await this.adminService.addAdmin(body);
-  //   return result;
-  // }
+  @Post('create-admin')
+  @UseGuards(AuthGuard, SuperAdmin)
+  async addAdmin(@Body() body: AdminDto) {
+    const result = await this.adminService.addAdmin(body);
+    return result;
+  }
 
   // @Delete('delete-admin/:email')
   // @UseGuards(AuthGuard, SuperAdmin)

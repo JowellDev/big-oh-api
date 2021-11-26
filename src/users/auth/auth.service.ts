@@ -70,24 +70,6 @@ export class AuthService {
     };
   }
 
-  async addAdmin(user: CreateUserDto) {
-    const userFound = await this.usersService.findByEmail(user.email);
-    if (userFound) {
-      throw new BadRequestException('Admin already exists');
-    }
-
-    const hashedPassword = await this.generateHash(user.password);
-    const newAdmin = await this.usersService.createAdmin(
-      user.email,
-      hashedPassword,
-    );
-
-    const { password, isAdmin, isSuperAdmin, ...result } = newAdmin;
-    return {
-      user: result,
-    };
-  }
-
   private async generateHash(password: string) {
     const salt = await bcrypt.genSalt(10);
     return await bcrypt.hash(password, salt);
