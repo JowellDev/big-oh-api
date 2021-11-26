@@ -72,6 +72,12 @@ export class UsersController {
     return await this.usersService.findOne(+id);
   }
 
+  @Get('user/find-by-email/:email')
+  @Serialize(UserDto)
+  async getUserByEmail(@Param('email') email: string) {
+    return await this.usersService.findByEmail(email);
+  }
+
   @Delete('user/:id')
   @UseGuards(AuthGuard)
   async deleteAccount(@CurrentUser() user: User, @Param('id') id: string) {
