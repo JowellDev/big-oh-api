@@ -7,13 +7,16 @@ import {
   Param,
   Put,
   Delete,
+  Get,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AdminDto } from './dtos/admin.dto';
+import { AdminListDto } from './dtos/admin-list.dto';
 import { AdminService } from './auth/admin.service';
 import { AuthGuard } from '../guards/auth.guard';
 import { AdminGuard } from '../guards/admin.guard';
 import { SuperAdmin } from '../guards/super-admin.guard';
+import { Serialize } from '../interceptors/serialize.interceptor';
 
 @Controller('admin')
 export class AdminController {
@@ -23,6 +26,13 @@ export class AdminController {
   async loginAdmin(@Body() body: AdminDto, @Res() response: Response) {
     const result = await this.adminService.loginAdmin(body);
     return response.status(200).json(result);
+  }
+
+  @Get('list')
+  @UseGuards(AuthGuard, AdminGuard)
+  @Serialize(AdminListDto)
+  async getAdmins() {
+    return await this.adminService.getAdmins();
   }
 
   @Post('create-admin')

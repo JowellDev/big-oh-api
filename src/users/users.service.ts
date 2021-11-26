@@ -59,7 +59,7 @@ export class UsersService {
 
   async delete(email: string) {
     const user = await this.findByEmail(email);
-    if (!user) {
+    if (!user && !user.isAdmin) {
       throw new NotFoundException('User not found');
     }
 
@@ -74,5 +74,9 @@ export class UsersService {
 
     userFound.isActive = !userFound.isActive;
     return await this.usersRepository.save(userFound);
+  }
+
+  async findAdmins(): Promise<User[]> {
+    return await this.usersRepository.find({ where: { isAdmin: true } });
   }
 }
