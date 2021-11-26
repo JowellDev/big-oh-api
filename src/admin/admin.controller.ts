@@ -32,12 +32,12 @@ export class AdminController {
     return result;
   }
 
-  // @Delete('delete-admin/:email')
-  // @UseGuards(AuthGuard, SuperAdmin)
-  // async deleteAdmin(@Param('email') email: string) {
-  //   const result = await this.adminService.deleteAdmin(email);
-  //   return result;
-  // }
+  @Delete('delete-admin/:email')
+  @UseGuards(AuthGuard, SuperAdmin)
+  async deleteAdmin(@Param('email') email: string) {
+    const result = await this.adminService.deleteAdmin(email);
+    return result;
+  }
 
   // @Put('change-user-status/:email')
   // @UseGuards(AuthGuard, AdminGuard)
