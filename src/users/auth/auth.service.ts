@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { UsersService } from '../users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -14,7 +18,7 @@ export class AuthService {
   async register(user: CreateUserDto) {
     const userFound = await this.usersService.findByEmail(user.email);
     if (userFound) {
-      throw new Error('User already exists');
+      throw new BadRequestException('User already exists');
     }
 
     const hashedPassword = await this.generateHash(user.password);
@@ -22,34 +26,69 @@ export class AuthService {
     const token = this.jwtService.sign({
       email: newUser.email,
     });
+
+    const { password, isAdmin, isSuperAdmin, ...result } = userFound;
     return {
-      user: newUser,
+      user: result,
       token,
     };
   }
 
   async login(user: CreateUserDto) {
     const userFound = await this.usersService.findByEmail(user.email);
-    if (!userFound) {
-      throw new Error('invalid credentials');
+    if (!userFound || !userFound.isActive) {
+      throw new NotFoundException('invalid credentials');
     }
 
     const isValid = await bcrypt.compare(user.password, userFound.password);
     if (!isValid) {
-      throw new Error('Invalid credentials');
+      throw new BadRequestException('Invalid credentials');
     }
 
     const token = this.jwtService.sign({
       email: userFound.email,
     });
 
+    const { password, isAdmin, isSuperAdmin, ...result } = userFound;
+
     return {
-      user: userFound,
+      user: result,
       token,
     };
   }
 
-  async generateHash(password: string) {
+  async resetPassword(email: string, password: string) {
+    const userFound = await this.usersService.findByEmail(email);
+    if (!userFound || !userFound.isActive) {
+      throw new NotFoundException('invalid credentials');
+    }
+    const hashedPassword = await this.generateHash(password);
+    await this.usersService.resetPassword(email, hashedPassword);
+
+    return {
+      message: 'Password reset successfully',
+    };
+  }
+
+  async addAdmin(user: CreateUserDto) {
+    const userFound = await this.usersService.findByEmail(user.email);
+    if (userFound) {
+      throw new BadRequestException('Admin already exists');
+    }
+
+    const hashedPassword = await this.generateHash(user.password);
+    const newAdmin = await this.usersService.createAdmin(
+      user.email,
+      hashedPassword,
+    );
+
+    const { password, isAdmin, isSuperAdmin, ...result } = newAdmin;
+    return {
+      user: result,
+    };
+  }
+
+  private async generateHash(password: string) {
     const salt = await bcrypt.genSalt(10);
     return await bcrypt.hash(password, salt);
   }

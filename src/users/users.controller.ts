@@ -1,9 +1,25 @@
-import { Controller, Post, Body, Get, Res } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Res,
+  UseGuards,
+  Req,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { AuthService } from './auth/auth.service';
+import { AuthGuard } from '../guards/auth.guard';
+import { AdminGuard } from '../guards/admin.guard';
+import { CurrentUser } from './decorators/current-user.decorator';
+import { Serialize } from '../interceptors/serialize.interceptor';
+import { UserDto } from './dtos/user.dto';
+import { SuperAdmin } from '../guards/super-admin.guard';
 
 @Controller('auth')
 export class UsersController {
@@ -13,26 +29,45 @@ export class UsersController {
   ) {}
 
   @Post('register')
-  async register(@Body() body: CreateUserDto, @Res() response: Response) {
+  async register(@Body() body: CreateUserDto) {
     const result = await this.authService.register(body);
     return result;
   }
 
   @Post('login')
-  async login(@Body() body: CreateUserDto) {
+  async login(@Body() body: CreateUserDto, @Res() response: Response) {
     const result = await this.authService.login(body);
-    return result;
+    return response.status(200).json(result);
   }
 
   @Get('me')
-  async current(@Body() body: CreateUserDto) {}
+  @UseGuards(AuthGuard)
+  @Serialize(UserDto)
+  async getMe(@CurrentUser() user: User) {
+    return user;
+  }
 
   @Post('logout')
-  async logout(@Body() body: CreateUserDto) {}
-
-  @Post('refresh')
-  async refresh(@Body() body: CreateUserDto) {}
+  async logout(@Req() req: any) {
+    req.user = null;
+    return {
+      message: 'logout success !',
+    };
+  }
 
   @Post('reset-password')
-  async resetPassword(@Body() body: CreateUserDto) {}
+  async resetPassword(
+    @Query('email') email: any,
+    @Body('password') password: string,
+  ) {
+    const result = await this.authService.resetPassword(email, password);
+    return result;
+  }
+
+  @Post('update')
+  @Serialize(UserDto)
+  async update(@Body('email') email: any) {
+    const result = await this.usersService.update(email);
+    return result;
+  }
 }

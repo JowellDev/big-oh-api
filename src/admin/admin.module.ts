@@ -1,11 +1,18 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
 import { AdminController } from './admin.controller';
-import { AuthService } from './auth/auth.service';
+import { AdminService } from './auth/admin.service';
 
 @Module({
   controllers: [AdminController],
-  providers: [AuthService],
-  imports: [UsersModule],
+  providers: [AdminService],
+  imports: [
+    UsersModule,
+    JwtModule.register({
+      secret: 'SECRET_CODE',
+      signOptions: { expiresIn: '1d' },
+    }),
+  ],
 })
 export class AdminModule {}
