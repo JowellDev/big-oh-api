@@ -9,6 +9,8 @@ import {
   Param,
   Query,
   Delete,
+  NotFoundException,
+  Put,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { UsersService } from './users.service';
@@ -75,7 +77,9 @@ export class UsersController {
   @Get('user/find-by-email/:email')
   @Serialize(UserDto)
   async getUserByEmail(@Param('email') email: string) {
-    return await this.usersService.findByEmail(email);
+    const user = await this.usersService.findByEmail(email);
+    if (!user) throw new NotFoundException('User not found');
+    return user;
   }
 
   @Delete('user/:id')
@@ -84,8 +88,8 @@ export class UsersController {
     return await this.usersService.deleteAccount(+id, user);
   }
 
-  @Post('update')
-  @UseGuards(AdminGuard)
+  @Put('update')
+  //@UseGuards(AdminGuard)
   @Serialize(UserDto)
   async update(@Body('email') email: any) {
     const result = await this.usersService.update(email);

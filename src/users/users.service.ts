@@ -58,7 +58,6 @@ export class UsersService {
 
     userFound.isAdmin = true;
     userFound.isSuperAdmin = true;
-    console.log(userFound);
     return await this.usersRepository.save(userFound);
   }
 

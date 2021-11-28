@@ -5,8 +5,12 @@ var dbConfig = {
 switch (process.env.NODE_ENV) {
   case 'development':
     Object.assign(dbConfig, {
-      type: 'sqlite',
-      database: 'blog.sqlite',
+      type: 'postgres',
+      host: 'localhost',
+      database: 'bigoh',
+      port: 5432,
+      username: 'jowell',
+      password: 'jowell',
       entities: ['**/*.entity.js'],
     });
     break;
