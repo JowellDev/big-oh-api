@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AdminGuard } from '../guards/admin.guard';
@@ -22,6 +23,11 @@ export class ArticlesController {
   @Get()
   async getArticles() {
     return await this.articlesService.findAll();
+  }
+
+  @Get('unpublished')
+  async getUnPublishedArticles() {
+    return await this.articlesService.findAllUnpublished();
   }
 
   @Get(':id')
@@ -48,5 +54,25 @@ export class ArticlesController {
   @UseGuards(AdminGuard)
   async deleteArticle(@Param('id') id: string) {
     return await this.articlesService.remove(+id);
+  }
+
+  @Get('search')
+  async fullTextSearch(@Query('keyword') keyword: string) {
+    return await this.articlesService.fullTextSearch(keyword);
+  }
+
+  @Get('filter')
+  async filterByCategory(@Query('category') category: string) {
+    return await this.articlesService.filterByCategory(category);
+  }
+
+  @Put(':id/publish')
+  async publishArticle(@Param('id') id: string) {
+    return await this.articlesService.publishArticle(+id);
+  }
+
+  @Put(':id/republish')
+  async rePublishArticle(@Param('id') id: string) {
+    return await this.articlesService.rePublishArticle(+id);
   }
 }

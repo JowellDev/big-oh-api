@@ -9,4 +9,7 @@ export class CreateArticleDto {
 
   @IsString()
   body: string;
+
+  @IsString()
+  category: string;
 }

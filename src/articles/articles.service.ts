@@ -11,8 +11,22 @@ export class ArticlesService {
     @InjectRepository(Article) private articlesRepo: Repository<Article>,
   ) {}
 
+  async findAllUnpublished(): Promise<Article[]> {
+    return await this.articlesRepo
+      .createQueryBuilder()
+      .select('*')
+      .where('isPublished IS false')
+      .orderBy('publishedAt', 'DESC')
+      .getRawMany();
+  }
+
   async findAll(): Promise<Article[]> {
-    return await this.articlesRepo.find();
+    return await this.articlesRepo
+      .createQueryBuilder()
+      .select('*')
+      .where('isPublished IS true')
+      .orderBy('publishedAt', 'DESC')
+      .getRawMany();
   }
 
   async findOne(id: number): Promise<Article> {
@@ -46,5 +60,49 @@ export class ArticlesService {
     return {
       message: 'Article deleted with success !',
     };
+  }
+
+  async fullTextSearch(keyword: string) {
+    return await this.articlesRepo
+      .createQueryBuilder()
+      .select('*')
+      .where('isPublished IS true')
+      .andWhere(':keyword IN body', { keyword })
+      .orderBy('publishedAt', 'DESC')
+      .getRawMany();
+  }
+
+  async filterByCategory(category: string) {
+    return await this.articlesRepo
+      .createQueryBuilder()
+      .select('*')
+      .where('isPublished IS true')
+      .andWhere('category = :category', { category })
+      .orderBy('publishedAt', 'DESC')
+      .getRawMany();
+  }
+
+  async publishArticle(id: number) {
+    const article = await this.findOne(id);
+    if (!article) throw new NotFoundException('Article not found');
+
+    const date = new Date();
+    const fullDate = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
+
+    article.isPublished = !article.isPublished;
+    article.publishedAt = fullDate;
+
+    return await this.articlesRepo.save(article);
+  }
+
+  async rePublishArticle(id: number) {
+    const article = await this.findOne(id);
+    if (!article) throw new NotFoundException('Article not found');
+
+    const date = new Date();
+    const fullDate = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
+    article.publishedAt = fullDate;
+
+    return await this.articlesRepo.save(article);
   }
 }

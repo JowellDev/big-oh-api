@@ -12,4 +12,8 @@ export class UpdateArticleDto {
   @IsString()
   @IsOptional()
   body: string;
+
+  @IsString()
+  @IsOptional()
+  category: string;
 }
