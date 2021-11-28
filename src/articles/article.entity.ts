@@ -14,9 +14,24 @@ export class Article {
   @Column()
   body: string;
 
+  @Column()
+  category: string;
+
   @Column({ default: 0 })
   likes: number;
 
+  @Column({ default: false })
+  isPublished: boolean;
+
   @Column()
   createAt: string;
+
+  @Column()
+  publishedAt: string;
+
+  // @OneToMany(() => Comment, (comment) => comment.article)
+  // comments: Comment[];
+
+  // @OneToMany(() => Likers, (likers) => likers.article)
+  // likers: Comment[];
 }
