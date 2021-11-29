@@ -9,12 +9,14 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '../guards/auth.guard';
 import { AdminGuard } from '../guards/admin.guard';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../users/user.entity';
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dtos/create-article.dto';
 import { UpdateArticleDto } from './dtos/update-article.dto';
+import { CommentArticleDto } from './dtos/comment-article.dto';
 
 @Controller('articles')
 export class ArticlesController {
@@ -79,7 +81,22 @@ export class ArticlesController {
   }
 
   @Post(':id/like')
-  async likeArticle(@Param('id') id: string) {
-    return await this.articlesService.likeArticle(+id);
+  @UseGuards(AuthGuard)
+  async likeArticle(@CurrentUser() user: User, @Param('id') articleId: string) {
+    return await this.articlesService.likeArticle(+articleId, user);
+  }
+
+  @Post(':id/comment')
+  @UseGuards(AuthGuard)
+  async commentArticle(
+    @CurrentUser() user: User,
+    @Param('id') articleId: string,
+    @Body() body: CommentArticleDto,
+  ) {
+    return await this.articlesService.commentArticle(
+      +articleId,
+      user,
+      body.comment,
+    );
   }
 }

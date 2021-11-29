@@ -11,7 +11,7 @@ import { Liker } from './liker.entity';
 export class ArticlesService {
   constructor(
     @InjectRepository(Article) private articlesRepo: Repository<Article>,
-    @InjectRepository(Comment) private commentRepo: Repository<Comment>,
+    @InjectRepository(Comment) private commentsRepo: Repository<Comment>,
     @InjectRepository(Liker) private likersRepo: Repository<Liker>,
   ) {}
 
@@ -105,11 +105,65 @@ export class ArticlesService {
     return await this.articlesRepo.save(article);
   }
 
-  async likeArticle(id: number) {
-    const article = await this.findOne(id);
+  async likeArticle(articleId: number, user: User) {
+    const article = await this.findOne(articleId);
     if (!article) throw new NotFoundException('Article not found');
 
+    const liker = await this.likersRepo.findOne({
+      user_email: user.email,
+      article_id: articleId,
+    });
+
+    if (liker) {
+      await this.likersRepo.remove(liker);
+      article.likes--;
+      await this.articlesRepo.save(article);
+      return {
+        message: 'Article unliked with success !',
+      };
+    }
+
+    await this.addLike(articleId, user);
     article.likes++;
-    return await this.articlesRepo.save(article);
+    await this.articlesRepo.save(article);
+
+    return {
+      message: 'Article liked with success !',
+    };
+  }
+
+  private async addLike(articleId: number, user: User) {
+    const date = new Date();
+    const fullDate = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
+    const newLiker = this.likersRepo.create({
+      user_email: user.email,
+      article_id: articleId,
+    });
+    newLiker.created_at = fullDate;
+    await this.likersRepo.save(newLiker);
+  }
+
+  async commentArticle(articleId: number, user: User, comment: string) {
+    const article = await this.findOne(articleId);
+    if (!article) throw new NotFoundException('Article not found');
+
+    await this.addComment(articleId, user, comment);
+
+    return {
+      message: 'comment save with success !',
+    };
+  }
+
+  private async addComment(articleId: number, user: User, comment: string) {
+    const date = new Date();
+    const fullDate = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
+    const newComment = this.commentsRepo.create({
+      body: comment,
+      user_email: user.email,
+      article_id: articleId,
+    });
+    newComment.created_at = fullDate;
+
+    await this.commentsRepo.save(newComment);
   }
 }
