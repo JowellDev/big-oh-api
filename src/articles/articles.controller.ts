@@ -100,4 +100,13 @@ export class ArticlesController {
       body.comment,
     );
   }
+
+  @Delete(':id/comment/:commentId')
+  @UseGuards(AuthGuard)
+  async deleteComment(
+    @Param('id') articleId: string,
+    @Param('commentId') commentId: string,
+  ) {
+    return await this.articlesService.deleteComment(+articleId, +commentId);
+  }
 }

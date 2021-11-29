@@ -187,4 +187,17 @@ export class ArticlesService {
 
     await this.commentsRepo.save(newComment);
   }
+
+  async deleteComment(articleId: number, commentId: number) {
+    const article = await this.findOne(articleId);
+    if (!article) throw new NotFoundException('Article not found');
+
+    const comment = await this.commentsRepo.findOne(commentId);
+    if (!comment) throw new NotFoundException('Comment not found');
+
+    await this.commentsRepo.remove(comment);
+    return {
+      message: 'Comment deleted with success !',
+    };
+  }
 }
