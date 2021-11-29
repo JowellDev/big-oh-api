@@ -1,8 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Comment } from './comment.entity';
+import { Liker } from './liker.entity';
 
 @Entity()
 export class Article {
-  @PrimaryGeneratedColumn({ type: 'int' })
+  @PrimaryGeneratedColumn('increment')
   id: number;
 
   @Column({ type: 'varchar', length: 255 })
@@ -28,4 +30,8 @@ export class Article {
 
   @Column({ type: 'varchar', nullable: true })
   published_at: string;
+
+  comments: Comment[];
+
+  likers: Liker[];
 }

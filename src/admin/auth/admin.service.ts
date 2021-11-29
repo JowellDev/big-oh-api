@@ -51,9 +51,7 @@ export class AdminService {
     );
 
     const { password, isAdmin, isSuperAdmin, ...result } = newAdmin;
-    return {
-      user: result,
-    };
+    return result;
   }
 
   async getAdmins() {
@@ -66,7 +64,16 @@ export class AdminService {
   }
 
   async deleteAdmin(email: string) {
-    return await this.usersService.deleteAdmin(email);
+    const admin = await this.usersService.findByEmail(email);
+    if (!admin) {
+      throw new NotFoundException('Admin not found');
+    }
+
+    await this.usersService.deleteAdmin(email);
+
+    return {
+      message: 'Admin deleted',
+    };
   }
 
   async changeUserStatus(email: string) {

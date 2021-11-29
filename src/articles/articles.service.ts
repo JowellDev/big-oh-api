@@ -19,8 +19,8 @@ export class ArticlesService {
     return await this.articlesRepo
       .createQueryBuilder('Article')
       .select('*')
-      .where('isPublished IS false')
-      .orderBy('publishedAt', 'DESC')
+      .where('is_published IS false')
+      .orderBy('published_at', 'DESC')
       .getRawMany();
   }
 
@@ -31,6 +31,11 @@ export class ArticlesService {
   async findOne(id: number): Promise<Article> {
     const articles = await this.articlesRepo.findOne(id);
     if (!articles) throw new NotFoundException('Article not found');
+
+    const comments = await this.commentsRepo.find({ article_id: id });
+    const likers = await this.likersRepo.find({ article_id: id });
+    articles.comments = comments;
+    articles.likers = likers;
 
     return articles;
   }
@@ -115,17 +120,17 @@ export class ArticlesService {
     });
 
     if (liker) {
-      await this.likersRepo.remove(liker);
       article.likes--;
+      await this.likersRepo.remove(liker);
       await this.articlesRepo.save(article);
       return {
         message: 'Article unliked with success !',
       };
     }
 
-    await this.addLike(articleId, user);
     article.likes++;
     await this.articlesRepo.save(article);
+    await this.addLike(articleId, user);
 
     return {
       message: 'Article liked with success !',
@@ -140,7 +145,7 @@ export class ArticlesService {
       article_id: articleId,
     });
     newLiker.created_at = fullDate;
-    await this.likersRepo.save(newLiker);
+    return await this.likersRepo.save(newLiker);
   }
 
   async commentArticle(articleId: number, user: User, comment: string) {
@@ -162,6 +167,7 @@ export class ArticlesService {
       user_email: user.email,
       article_id: articleId,
     });
+
     newComment.created_at = fullDate;
 
     await this.commentsRepo.save(newComment);

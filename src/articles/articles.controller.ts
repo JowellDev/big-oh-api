@@ -38,6 +38,7 @@ export class ArticlesController {
   }
 
   @Get('unpublished')
+  @UseGuards(AdminGuard)
   async getUnPublishedArticles() {
     return await this.articlesService.findAllUnpublished();
   }

@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 @Entity()
 export class Liker {
-  @PrimaryGeneratedColumn({ type: 'int' })
+  @PrimaryGeneratedColumn('increment')
   id: number;
 
   @Column({ type: 'int' })
