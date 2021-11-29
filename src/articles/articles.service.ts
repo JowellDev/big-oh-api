@@ -60,6 +60,21 @@ export class ArticlesService {
     const article = await this.articlesRepo.findOne(id);
     if (!article) throw new NotFoundException('Article not found');
 
+    const comments = await this.commentsRepo.find({ article_id: id });
+    const likers = await this.likersRepo.find({ article_id: id });
+
+    if (comments) {
+      comments.map(async (comment) => {
+        await this.commentsRepo.remove(comment);
+      });
+    }
+
+    if (likers) {
+      likers.map(async (liker) => {
+        await this.likersRepo.remove(liker);
+      });
+    }
+
     await this.articlesRepo.remove(article);
     return {
       message: 'Article deleted with success !',
