@@ -78,7 +78,7 @@ export class ArticlesController {
     return await this.articlesService.rePublishArticle(+id);
   }
 
-  @Post(':id')
+  @Post(':id/like')
   async likeArticle(@Param('id') id: string) {
     return await this.articlesService.likeArticle(+id);
   }

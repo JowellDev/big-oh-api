@@ -4,11 +4,15 @@ import { User } from '../users/user.entity';
 import { Repository } from 'typeorm';
 import { Article } from './article.entity';
 import { CreateArticleDto } from './dtos/create-article.dto';
+import { Comment } from './comment.entity';
+import { Liker } from './liker.entity';
 
 @Injectable()
 export class ArticlesService {
   constructor(
     @InjectRepository(Article) private articlesRepo: Repository<Article>,
+    @InjectRepository(Comment) private commentRepo: Repository<Comment>,
+    @InjectRepository(Liker) private likersRepo: Repository<Liker>,
   ) {}
 
   async findAllUnpublished(): Promise<Article[]> {
@@ -103,6 +107,8 @@ export class ArticlesService {
 
   async likeArticle(id: number) {
     const article = await this.findOne(id);
+    if (!article) throw new NotFoundException('Article not found');
+
     article.likes++;
     return await this.articlesRepo.save(article);
   }

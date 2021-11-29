@@ -9,11 +9,11 @@ export class Comment {
   body: string;
 
   @Column()
-  articleId: number;
+  article_id: number;
 
   @Column()
-  userEmail: string;
+  user_email: string;
 
   @Column()
-  createdAt: string;
+  created_at: string;
 }
