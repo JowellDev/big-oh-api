@@ -25,6 +25,16 @@ export class ArticlesController {
     return await this.articlesService.findAll();
   }
 
+  @Get('search')
+  async fullTextSearch(@Query('keyword') keyword: string) {
+    return await this.articlesService.fullTextSearch(keyword);
+  }
+
+  @Get('filter')
+  async filterByCategory(@Query('category') category: string) {
+    return await this.articlesService.filterByCategory(category);
+  }
+
   @Get('unpublished')
   async getUnPublishedArticles() {
     return await this.articlesService.findAllUnpublished();
@@ -56,23 +66,20 @@ export class ArticlesController {
     return await this.articlesService.remove(+id);
   }
 
-  @Get('search')
-  async fullTextSearch(@Query('keyword') keyword: string) {
-    return await this.articlesService.fullTextSearch(keyword);
-  }
-
-  @Get('filter')
-  async filterByCategory(@Query('category') category: string) {
-    return await this.articlesService.filterByCategory(category);
-  }
-
   @Put(':id/publish')
+  @UseGuards(AdminGuard)
   async publishArticle(@Param('id') id: string) {
     return await this.articlesService.publishArticle(+id);
   }
 
   @Put(':id/republish')
+  @UseGuards(AdminGuard)
   async rePublishArticle(@Param('id') id: string) {
     return await this.articlesService.rePublishArticle(+id);
+  }
+
+  @Post(':id')
+  async likeArticle(@Param('id') id: string) {
+    return await this.articlesService.likeArticle(+id);
   }
 }

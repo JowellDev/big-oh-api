@@ -13,7 +13,7 @@ export class ArticlesService {
 
   async findAllUnpublished(): Promise<Article[]> {
     return await this.articlesRepo
-      .createQueryBuilder()
+      .createQueryBuilder('Article')
       .select('*')
       .where('isPublished IS false')
       .orderBy('publishedAt', 'DESC')
@@ -21,12 +21,7 @@ export class ArticlesService {
   }
 
   async findAll(): Promise<Article[]> {
-    return await this.articlesRepo
-      .createQueryBuilder()
-      .select('*')
-      .where('isPublished IS true')
-      .orderBy('publishedAt', 'DESC')
-      .getRawMany();
+    return await this.articlesRepo.find({ is_published: true });
   }
 
   async findOne(id: number): Promise<Article> {
@@ -40,7 +35,7 @@ export class ArticlesService {
     const newArticle = this.articlesRepo.create(article);
     const date = new Date();
     const fullDate = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
-    newArticle.createAt = fullDate;
+    newArticle.created_at = fullDate;
     return await this.articlesRepo.save(newArticle);
   }
 
@@ -64,21 +59,21 @@ export class ArticlesService {
 
   async fullTextSearch(keyword: string) {
     return await this.articlesRepo
-      .createQueryBuilder()
-      .select('*')
-      .where('isPublished IS true')
-      .andWhere(':keyword IN body', { keyword })
-      .orderBy('publishedAt', 'DESC')
+      .createQueryBuilder('Article')
+      .where('body ILIKE :value', { value: `%${keyword}%` })
+      .orWhere('title ILIKE :value', { value: `%${keyword}%` })
+      .andWhere('is_published IS true')
+      .orderBy('published_at', 'DESC')
       .getRawMany();
   }
 
   async filterByCategory(category: string) {
     return await this.articlesRepo
-      .createQueryBuilder()
+      .createQueryBuilder('Article')
       .select('*')
-      .where('isPublished IS true')
-      .andWhere('category = :category', { category })
-      .orderBy('publishedAt', 'DESC')
+      .where('category = :category', { category })
+      .andWhere('is_published IS true')
+      .orderBy('published_at', 'DESC')
       .getRawMany();
   }
 
@@ -89,8 +84,8 @@ export class ArticlesService {
     const date = new Date();
     const fullDate = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
 
-    article.isPublished = !article.isPublished;
-    article.publishedAt = fullDate;
+    article.is_published = !article.is_published;
+    article.published_at = fullDate;
 
     return await this.articlesRepo.save(article);
   }
@@ -101,8 +96,14 @@ export class ArticlesService {
 
     const date = new Date();
     const fullDate = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
-    article.publishedAt = fullDate;
+    article.published_at = fullDate;
 
+    return await this.articlesRepo.save(article);
+  }
+
+  async likeArticle(id: number) {
+    const article = await this.findOne(id);
+    article.likes++;
     return await this.articlesRepo.save(article);
   }
 }

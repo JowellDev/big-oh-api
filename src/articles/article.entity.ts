@@ -2,36 +2,30 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
 export class Article {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar', length: 255 })
   title: string;
 
-  @Column()
+  @Column({ type: 'text' })
   description: string;
 
-  @Column()
+  @Column({ type: 'text' })
   body: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 255 })
   category: string;
 
-  @Column({ default: 0 })
+  @Column({ type: 'int', default: 0 })
   likes: number;
 
-  @Column({ default: false })
-  isPublished: boolean;
+  @Column({ type: 'bool', default: false })
+  is_published: boolean;
 
-  @Column()
-  createAt: string;
+  @Column({ type: 'varchar' })
+  created_at: string;
 
-  @Column()
-  publishedAt: string;
-
-  // @OneToMany(() => Comment, (comment) => comment.article)
-  // comments: Comment[];
-
-  // @OneToMany(() => Likers, (likers) => likers.article)
-  // likers: Comment[];
+  @Column({ type: 'varchar', nullable: true })
+  published_at: string;
 }

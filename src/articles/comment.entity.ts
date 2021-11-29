@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
 export class Comment {
@@ -8,15 +8,12 @@ export class Comment {
   @Column()
   body: string;
 
-  @PrimaryColumn({ type: 'int' })
-  article_id: number;
+  @Column()
+  articleId: number;
 
-  @PrimaryColumn({ type: 'int' })
-  user_id: number;
+  @Column()
+  userEmail: string;
 
   @Column()
   createdAt: string;
-
-  // @ManyToOne(() => Article, (article) => article.comments)
-  // article: Article;
 }
