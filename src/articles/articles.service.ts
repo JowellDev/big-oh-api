@@ -25,7 +25,13 @@ export class ArticlesService {
   }
 
   async findAll(): Promise<Article[]> {
-    return await this.articlesRepo.find({ is_published: true });
+    return await this.articlesRepo
+      .createQueryBuilder('Article')
+      .select('*')
+      .where('is_published IS true')
+      .orderBy('id', 'DESC')
+      .getRawMany();
+    //return await this.articlesRepo.find({ is_published: true });
   }
 
   async findOne(id: number): Promise<Article> {
