@@ -44,7 +44,8 @@ export class ArticlesController {
   }
 
   @Get(':id')
-  async getArticle(@Param('id') id: string) {
+  @UseGuards(AuthGuard)
+  async getArticle(@CurrentUser() user: User, @Param('id') id: string) {
     return await this.articlesService.findOne(+id);
   }
 
