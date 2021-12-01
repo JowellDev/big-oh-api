@@ -7,13 +7,31 @@ import { CreateUserDto } from '../dtos/create-user.dto';
 import { UsersService } from '../users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { SendGridService } from '@anchan828/nest-sendgrid';
+import { User } from '../user.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private readonly sendGrid: SendGridService,
   ) {}
+
+  async sendWelcomeMail(user: User): Promise<void> {
+    await this.sendGrid.send({
+      to: user.email,
+      from: 'ephraimdigbeu@gmail.com',
+      subject: 'Bienvenu sur The big oh',
+      text: 'Inscription reussie, la communauté vous attend les bras ouverts.',
+      html: `
+        <h3>Welcome !</h3>
+        <p>Aujourd'hui est un grand jour, nous nous sommes heureux de vous compter parmi nous</p>
+        <p>On apprendra beaucoup de chose ensemble</p>
+        <h4 style="color: blue;">Cordialement !</h4>
+      `,
+    });
+  }
 
   async register(user: CreateUserDto) {
     const userFound = await this.usersService.findByEmail(user.email);
@@ -28,6 +46,8 @@ export class AuthService {
     });
 
     const { password, isAdmin, isSuperAdmin, ...result } = newUser;
+    await this.sendWelcomeMail(userFound);
+
     return {
       user: result,
       token,
@@ -50,7 +70,6 @@ export class AuthService {
     });
 
     const { password, isAdmin, isSuperAdmin, ...result } = userFound;
-
     return {
       user: result,
       token,
