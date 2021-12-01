@@ -35,15 +35,15 @@ export class ArticlesService {
   }
 
   async findOne(id: number): Promise<Article> {
-    const articles = await this.articlesRepo.findOne(id);
-    if (!articles) throw new NotFoundException('Article not found');
+    const article = await this.articlesRepo.findOne(id);
+    if (!article) throw new NotFoundException('Article not found');
 
     const comments = await this.commentsRepo.find({ article_id: id });
     const likers = await this.likersRepo.find({ article_id: id });
-    articles.comments = comments;
-    articles.likers = likers;
+    article.comments = comments;
+    article.likers = likers;
 
-    return articles;
+    return article;
   }
 
   async create(article: CreateArticleDto, user: User): Promise<Article> {
@@ -90,20 +90,22 @@ export class ArticlesService {
   async fullTextSearch(keyword: string) {
     return await this.articlesRepo
       .createQueryBuilder('Article')
+      .select('*')
       .where('body ILIKE :value', { value: `%${keyword}%` })
       .orWhere('title ILIKE :value', { value: `%${keyword}%` })
       .andWhere('is_published IS true')
-      .orderBy('published_at', 'DESC')
+      .orderBy('id', 'DESC')
       .getRawMany();
   }
 
   async filterByCategory(category: string) {
+    if (category === '') return this.findAll();
     return await this.articlesRepo
       .createQueryBuilder('Article')
       .select('*')
       .where('category = :category', { category })
       .andWhere('is_published IS true')
-      .orderBy('published_at', 'DESC')
+      .orderBy('id', 'DESC')
       .getRawMany();
   }
 
@@ -144,18 +146,23 @@ export class ArticlesService {
       article.likes--;
       await this.likersRepo.remove(liker);
       await this.articlesRepo.save(article);
-      return {
-        message: 'Article unliked with success !',
-      };
+      const comments = await this.commentsRepo.find({ article_id: articleId });
+      const likers = await this.likersRepo.find({ article_id: articleId });
+      article.comments = comments;
+      article.likers = likers;
+
+      return article;
     }
 
     article.likes++;
     await this.articlesRepo.save(article);
     await this.addLike(articleId, user);
+    const comments = await this.commentsRepo.find({ article_id: articleId });
+    const likers = await this.likersRepo.find({ article_id: articleId });
+    article.comments = comments;
+    article.likers = likers;
 
-    return {
-      message: 'Article liked with success !',
-    };
+    return article;
   }
 
   private async addLike(articleId: number, user: User) {
@@ -174,10 +181,11 @@ export class ArticlesService {
     if (!article) throw new NotFoundException('Article not found');
 
     await this.addComment(articleId, user, comment);
-
-    return {
-      message: 'comment save with success !',
-    };
+    const comments = await this.commentsRepo.find({ article_id: articleId });
+    const likers = await this.likersRepo.find({ article_id: articleId });
+    article.comments = comments;
+    article.likers = likers;
+    return article;
   }
 
   private async addComment(articleId: number, user: User, comment: string) {
