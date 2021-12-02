@@ -26,6 +26,7 @@ export class AdminController {
   constructor(private adminService: AdminService) {}
 
   @Post('login')
+  @Serialize(AdminDetailDto)
   async loginAdmin(@Body() body: AdminDto, @Res() response: Response) {
     const result = await this.adminService.loginAdmin(body);
     return response.status(200).json(result);

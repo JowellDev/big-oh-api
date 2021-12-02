@@ -30,7 +30,7 @@ export class AdminService {
       email: userFound.email,
     });
 
-    const { password, isAdmin, isSuperAdmin, ...result } = userFound;
+    const { password, ...result } = userFound;
 
     return {
       user: result,
