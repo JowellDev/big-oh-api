@@ -46,7 +46,7 @@ export class AuthService {
     });
 
     const { password, isAdmin, isSuperAdmin, ...result } = newUser;
-    await this.sendWelcomeMail(userFound);
+    await this.sendWelcomeMail(newUser);
 
     return {
       user: result,
