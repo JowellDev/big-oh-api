@@ -88,6 +88,7 @@ export class ArticlesService {
   }
 
   async fullTextSearch(keyword: string) {
+    if (keyword === '') return this.findAll();
     return await this.articlesRepo
       .createQueryBuilder('Article')
       .select('*')
