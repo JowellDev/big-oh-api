@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../users/user.entity';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { Article } from './article.entity';
 import { CreateArticleDto } from './dtos/create-article.dto';
 import { Comment } from './comment.entity';
@@ -20,7 +20,7 @@ export class ArticlesService {
       .createQueryBuilder('Article')
       .select('*')
       .where('is_published IS false')
-      .orderBy('published_at', 'DESC')
+      .orderBy('id', 'DESC')
       .getRawMany();
   }
 
@@ -31,7 +31,6 @@ export class ArticlesService {
       .where('is_published IS true')
       .orderBy('id', 'DESC')
       .getRawMany();
-    //return await this.articlesRepo.find({ is_published: true });
   }
 
   async findOne(id: number): Promise<Article> {
@@ -62,29 +61,36 @@ export class ArticlesService {
     return await this.articlesRepo.save(articleFound);
   }
 
-  async remove(id: number) {
-    const article = await this.articlesRepo.findOne(id);
+  async remove(articleId: number) {
+    const article = await this.articlesRepo.findOne(articleId);
     if (!article) throw new NotFoundException('Article not found');
 
-    const comments = await this.commentsRepo.find({ article_id: id });
-    const likers = await this.likersRepo.find({ article_id: id });
+    await this.removeArticleComment(articleId);
+    await this.removeArticleLikers(articleId);
 
+    await this.articlesRepo.remove(article);
+
+    return {
+      message: 'Article deleted with success !',
+    };
+  }
+
+  async removeArticleComment(articleId: number) {
+    const comments = await this.commentsRepo.find({ article_id: articleId });
     if (comments) {
       comments.map(async (comment) => {
         await this.commentsRepo.remove(comment);
       });
     }
+  }
 
+  async removeArticleLikers(articleId: number) {
+    const likers = await this.likersRepo.find({ article_id: articleId });
     if (likers) {
       likers.map(async (liker) => {
         await this.likersRepo.remove(liker);
       });
     }
-
-    await this.articlesRepo.remove(article);
-    return {
-      message: 'Article deleted with success !',
-    };
   }
 
   async fullTextSearch(keyword: string) {
@@ -92,9 +98,14 @@ export class ArticlesService {
     return await this.articlesRepo
       .createQueryBuilder('Article')
       .select('*')
-      .where('body ILIKE :value', { value: `%${keyword}%` })
-      .orWhere('title ILIKE :value', { value: `%${keyword}%` })
-      .andWhere('is_published IS true')
+      .where('is_published IS true')
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('body ILIKE :value', {
+            value: `%${keyword}%`,
+          }).orWhere('title ILIKE :value', { value: `%${keyword}%` });
+        }),
+      )
       .orderBy('id', 'DESC')
       .getRawMany();
   }
