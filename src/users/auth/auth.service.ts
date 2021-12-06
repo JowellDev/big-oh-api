@@ -46,7 +46,7 @@ export class AuthService {
     });
 
     const { password, isAdmin, isSuperAdmin, ...result } = newUser;
-    await this.sendWelcomeMail(newUser);
+    //await this.sendWelcomeMail(newUser);
 
     return {
       user: result,
@@ -69,7 +69,9 @@ export class AuthService {
       email: userFound.email,
     });
 
-    const { password, isAdmin, isSuperAdmin, ...result } = userFound;
+    const { password, ...result } = userFound;
+    //await this.sendWelcomeMail(userFound);
+
     return {
       user: result,
       token,

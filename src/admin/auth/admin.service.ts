@@ -41,7 +41,7 @@ export class AdminService {
   async addAdmin(user: AdminDto) {
     const userFound = await this.usersService.findByEmail(user.email);
     if (userFound) {
-      throw new BadRequestException('Admin already exists');
+      throw new BadRequestException('Email already exists');
     }
 
     const hashedPassword = await this.generateHash(user.password);
