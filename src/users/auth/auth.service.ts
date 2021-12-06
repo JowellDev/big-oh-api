@@ -70,7 +70,6 @@ export class AuthService {
     });
 
     const { password, ...result } = userFound;
-    //await this.sendWelcomeMail(userFound);
 
     return {
       user: result,
